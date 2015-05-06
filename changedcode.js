@@ -14,3 +14,9 @@ Enemy.prototype.update = function(deltaTime)
 		this.rotation -= deltaTime;
 	}
 }
+
+player/enemy
+this.position = Vector2();
+
+this.offset = new Vector2 ();
+		this.offset.set(-55,-87);

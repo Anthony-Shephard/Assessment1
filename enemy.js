@@ -6,7 +6,7 @@ var Enemy = function()
 		this.width = 159;
 		this.height = 163;
 		this.image.src = "skeleton.png";
-		this.position = Vector2();
+		
 		this.isDead = false;
 	};
 
