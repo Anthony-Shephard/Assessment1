@@ -47,8 +47,8 @@ var TILESET_PADDING = 2;
 var TILESET_SPACING = 2;
 var TILESET_COUNT_X = 14;
 var TILESET_COUNT_Y = 14;
-var LAYER_background = 0;
-var LAYER_platforms = 1;
+var LAYER_background = 1;
+var LAYER_platforms = 0;
 var LAYER_rope = 3;
 var LAYER_cactus = 4;
 var LAYER_water = 2;
@@ -150,6 +150,35 @@ function drawMap()
 	 }
 }
 
+var cells = []; // the array that holds our simplified collision data
+function initialize() 
+{
+	 for(var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++) { // initialize the collision map
+	 	cells[layerIdx] = [];
+	 	var idx = 0;
+	 	for(var y = 0; y < level1.layers[layerIdx].height; y++) {
+	 		cells[layerIdx][y] = [];
+			 for(var x = 0; x < level1.layers[layerIdx].width; x++) {
+	 			if(level1.layers[layerIdx].data[idx] != 0) {
+
+// for each tile we find in the layer data, we need to create 4 collisions
+// (because our collision squares are 35x35 but the tile in the
+// level are 70x70)
+			 cells[layerIdx][y][x] = 1;
+			cells[layerIdx][y-1][x] = 1;
+			cells[layerIdx][y-1][x+1] = 1;
+			cells[layerIdx][y][x+1] = 1;
+			}
+ else if(cells[layerIdx][y][x] != 1) {
+// if we haven't set this cell's value, then set it to 0 now
+			 cells[layerIdx][y][x] = 0;
+			}
+		 		idx++;
+			}
+		}
+	}
+}
+
 function run()
 {
 	context.fillStyle = "#ccc";		
@@ -181,34 +210,9 @@ function run()
 	context.fillText("FPS: " + fps, 5, 20, 100);
 }
 
-var cells = []; // the array that holds our simplified collision data
-function initialize() 
-{
-	 for(var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++) { // initialize the collision map
-	 	cells[layerIdx] = [];
-	 	var idx = 0;
-	 	for(var y = 0; y < level1.layers[layerIdx].height; y++) {
-	 		cells[layerIdx][y] = [];
-			 for(var x = 0; x < level1.layers[layerIdx].width; x++) {
-	 			if(level1.layers[layerIdx].data[idx] != 0) {
+initialize();
 
-// for each tile we find in the layer data, we need to create 4 collisions
-// (because our collision squares are 35x35 but the tile in the
-// level are 70x70)
-			 cells[layerIdx][y][x] = 1;
-			cells[layerIdx][y-1][x] = 1;
-			cells[layerIdx][y-1][x+1] = 1;
-			cells[layerIdx][y][x+1] = 1;
-			 }
- else if(cells[layerIdx][y][x] != 1) {
-// if we haven't set this cell's value, then set it to 0 now
- cells[layerIdx][y][x] = 0;
-	}
- idx++;
-			 }
-		 }
-	 }
-}
+
 
 
 
