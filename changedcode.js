@@ -20,3 +20,8 @@ this.position = Vector2();
 
 this.offset = new Vector2 ();
 		this.offset.set(-55,-87);
+
+				this.velocityX = 0;
+		this.velocityXY = 0;
+		this.angularVelocity = 0;
+		this.rotation = 0;
