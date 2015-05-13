@@ -38,7 +38,6 @@ var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
 var player = new Player();
 var keyboard = new Keyboard();
-var enemy = new Enemy();
 var LAYER_COUNT = 7;
 var MAP = { tw: 90, th: 15 };
 var TILE = 35;
@@ -192,7 +191,6 @@ function run()
 	player.draw();
 
 	
-	enemy.draw();
 	
 		// update the frame counter 
 	fpsTime += deltaTime;
