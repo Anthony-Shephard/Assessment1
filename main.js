@@ -46,8 +46,8 @@ var TILESET_PADDING = 2;
 var TILESET_SPACING = 2;
 var TILESET_COUNT_X = 14;
 var TILESET_COUNT_Y = 14;
-var LAYER_background = 1;
-var LAYER_platforms = 0;
+var LAYER_background = 0;
+var LAYER_PLATFORMS = 1;
 var LAYER_rope = 3;
 var LAYER_cactus = 4;
 var LAYER_water = 2;
@@ -186,12 +186,11 @@ function run()
 	var deltaTime = getDeltaTime();
 
 	drawMap();
+	
 
 	player.update(deltaTime);
 	player.draw();
 
-	
-	
 		// update the frame counter 
 	fpsTime += deltaTime;
 	fpsCount++;
@@ -209,6 +208,9 @@ function run()
 }
 
 initialize();
+
+
+
 
 
 

@@ -25,3 +25,23 @@ this.offset = new Vector2 ();
 		this.velocityXY = 0;
 		this.angularVelocity = 0;
 		this.rotation = 0;
+
+
+DrawCellCollision();
+
+function DrawCellCollision() {    
+    for(var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++)
+        {
+                // initialize the collision map
+        for(var y = 0; y < level1.layers[layerIdx].height; y++) {        
+            for(var x = 0; x < level1.layers[layerIdx].width; x++) {
+ 
+                                if(cells[layerIdx][y][x] > 0)
+                                {
+                                        context.fillStyle = "#c0c";            
+                                        context.fillRect(35*x, 35*y, 35, 35);
+                                }
+            }
+        }  
+    }
+}
