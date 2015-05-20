@@ -50,7 +50,7 @@ var Player = function()
 		}
 
 		this.position = new Vector2 ();
-		this.position.Set(10*35, 5*35);
+		this.position.Set(1*35, 5*35);
 		this.width = 159;
 		this.height = 163;
 		this.velocity = new Vector2 ();
@@ -211,7 +211,7 @@ Player.prototype.update = function(deltaTime)
 
 Player.prototype.draw = function()
 	{
-		this.sprite.draw(context, this.position.x, this.position.y);
+		this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y);
 		context.save();
 		context.translate(this.x, this.y);
 		context.restore();
