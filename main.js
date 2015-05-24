@@ -55,8 +55,8 @@ var LAYER_ROPE = 5;
 var LAYER_CACTUS = 2;
 var LAYER_WATER = 4;
 var LAYER_SIGNS = 3;
-var LAYER_OBJECT_ENEMIES = 7;
-var LAYER_OBJECT_TRIGGERS = 6;
+var LAYER_OBJECT_ENEMIES = 6;
+var LAYER_OBJECT_TRIGGERS = 7;
 var Score = 0;
 var Lives = 3;
 var musicBackground;
@@ -93,8 +93,8 @@ var fpsTime = 0;
 var chuckNorris = document.createElement("img");
 chuckNorris.src = "hero.png";
 
-var skeleton = document.createElement("img");
-skeleton.src = "skeleton.png";
+var baby = document.createElement("img");
+baby.src = "baby.png";
 
 var tileset = document.createElement("img");
 tileset.src = "tileset.png";
@@ -292,6 +292,12 @@ for(var i=0; i<Lives; i++)
 	{
 	 	context.drawImage(head, 10 + ((head.width+2)*i), 20);
 	}
+
+//draw enemy
+for(var i=0; i<enemies.length; i++)
+	{
+		enemies[i].draw(deltaTime);
+	}	
 
 //enemy updater
 for(var i=0; i<enemies.length; i++)

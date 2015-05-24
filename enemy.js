@@ -11,7 +11,7 @@ var Enemy = function(x, y)
 	this.sprite.setAnimationOffset(0, -35, -40);
 
 	this.position = new Vector2();
-	this.position.set(x, y);
+	this.position.Set(x, y);
 
 	this.width = 32;
 	this.height = 32;
