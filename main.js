@@ -38,25 +38,33 @@ var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
 var player = new Player();
 var keyboard = new Keyboard();
+var ENEMY_MAXDX = METER* 5;
+var ENEMY_ACCEL = ENEMY_MAXDX* 2;
+var enemies = [];
 var LAYER_COUNT = 7;
-var MAP = { tw: 90, th: 15 };
+var MAP = { tw: 90, th: 20 };
 var TILE = 35;
 var TILESET_TILE = TILE * 2;
 var TILESET_PADDING = 2;
 var TILESET_SPACING = 2;
 var TILESET_COUNT_X = 14;
 var TILESET_COUNT_Y = 14;
-var LAYER_background = 0;
+var LAYER_BACKGROUND = 0;
 var LAYER_PLATFORMS = 1;
-var LAYER_rope = 3;
-var LAYER_cactus = 4;
-var LAYER_water = 2;
-var LAYER_arrows = 5;
-var LAYER_item = 6;
+var LAYER_ROPE = 5;
+var LAYER_CACTUS = 2;
+var LAYER_WATER = 4;
+var LAYER_SIGNS = 3;
+var LAYER_OBJECT_ENEMIES = 7;
+var LAYER_OBJECT_TRIGGERS = 6;
 var Score = 0;
 var Lives = 3;
+var musicBackground;
+var sfxFire;
 var head = document.createElement ("img");
 	head.src = "head.png";
+
+
 
 
 	// abitrary choice for 1m
@@ -131,7 +139,6 @@ function bound(value, min, max)
 }
 
 var worldOffsetX = 0;
-
 function drawMap()	
 {
 	var startX = -1;
@@ -165,14 +172,13 @@ function drawMap()
 
 	 for(var layerIdx=0; layerIdx<LAYER_COUNT; layerIdx++)
 	 {
-		 var idx = 0;
 		 for( var y = 0; y < level1.layers[layerIdx].height; y++ )
-		 {
+		{
 		 	var idx = y * level1.layers[layerIdx].width + startX;
 		 	for( var x = startX; x < startX + maxTiles; x++ )
-			 {
+			{
 			 	if( level1.layers[layerIdx].data[idx] != 0 )
-			 {
+			{
 				 // the tiles in the Tiled map are base 1 (meaning a value of 0 means no tile), so subtract one from the tileset id to get the
 				 // correct tile
 				 var tileIndex = level1.layers[layerIdx].data[idx] - 1;
@@ -181,9 +187,9 @@ function drawMap()
 				 context.drawImage(tileset, sx, sy, TILESET_TILE, TILESET_TILE, (x - startX)*TILE - offsetX, (y-1)*TILE, TILESET_TILE, TILESET_TILE);
  				}
 				 idx++;
-			 }
+			}
  		}
-	 }
+	}
 }
 
 var cells = []; // the array that holds our simplified collision data
@@ -213,7 +219,40 @@ function initialize()
 			}
 		}
 	}
+	musicBackground = new Howl(
+	{
+		urls: ["background.ogg"],
+		loop: true,
+		buffer: true,
+		volume: 0.0
+	});
+	musicBackground.play();
+
+	sfxFire = new Howl(
+	{
+		urls: ["fireEffect.ogg"],
+		buffer: true,
+		volume: 1,
+		onend: function() {
+			isSfxPlaying = false;
+		}
+	});
+
+// add enemies
+idx = 0;
+for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++) {
+	for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++) {
+		if(level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0) {
+			var px = tileToPixel(x);
+			var py = tileToPixel(y);
+			var e = new Enemy(px, py);
+			enemies.push(e);
+		}
+		idx++;
+	}
+} 
 }
+
 
 function run()
 {
@@ -222,10 +261,9 @@ function run()
 	
 	var deltaTime = getDeltaTime();
 
-	drawMap();
-	
-
 	player.update(deltaTime);
+
+	drawMap();
 	player.draw();
 
 		// update the frame counter 
@@ -254,6 +292,13 @@ for(var i=0; i<Lives; i++)
 	{
 	 	context.drawImage(head, 10 + ((head.width+2)*i), 20);
 	}
+
+//enemy updater
+for(var i=0; i<enemies.length; i++)
+	{
+		enemies[i].update(deltaTime);
+	}
+
 }
 
 initialize();
