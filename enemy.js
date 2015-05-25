@@ -1,3 +1,7 @@
+var ANIM_WALK_LEFT = 0;
+var ANIM_WALK_RIGHT = 1;
+var ANIM_MAX = 2;
+
 var Enemy = function(x, y)
 {
 	this.sprite = new Sprite("baby.png");
@@ -12,17 +16,11 @@ var Enemy = function(x, y)
 
 	this.position = new Vector2();
 	this.position.Set(x, y);
-
-	this.width = 32;
-	this.height = 32;
 	
 	this.velocity = new Vector2();
 	
 	this.moveRight = true;
 	this.pause = 0;
-	this.falling = true;
-	this.jumping = false;
-	this.isDead = false;
 }
 
 Enemy.prototype.update = function(dt)
@@ -79,12 +77,10 @@ Enemy.prototype.update = function(dt)
 		this.velocity.x = bound(this.velocity.x + (dt * ddx),
 		-ENEMY_MAXDX, ENEMY_MAXDX);
 	}
+
+	Enemy.prototype.draw = function()
+	{
+		this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y);
+	}
 }
 
-Enemy.prototype.draw = function()
-	{
-		this.sprite.draw(context, this.position.x, this.position.y);
-		context.save();
-		context.translate(this.x, this.y);
-		context.restore();
-	}

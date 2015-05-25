@@ -41,7 +41,7 @@ var keyboard = new Keyboard();
 var ENEMY_MAXDX = METER* 5;
 var ENEMY_ACCEL = ENEMY_MAXDX* 2;
 var enemies = [];
-var LAYER_COUNT = 7;
+var LAYER_COUNT = 6;
 var MAP = { tw: 90, th: 20 };
 var TILE = 35;
 var TILESET_TILE = TILE * 2;
@@ -266,6 +266,18 @@ function run()
 	drawMap();
 	player.draw();
 
+	//draw enemy
+for(var i=0; i<enemies.length; i++)
+	{
+		enemies[i].draw;
+	}	
+
+//enemy updater
+for(var i=0; i<enemies.length; i++)
+	{
+		enemies[i].update(deltaTime);
+	}
+
 		// update the frame counter 
 	fpsTime += deltaTime;
 	fpsCount++;
@@ -292,19 +304,6 @@ for(var i=0; i<Lives; i++)
 	{
 	 	context.drawImage(head, 10 + ((head.width+2)*i), 20);
 	}
-
-//draw enemy
-for(var i=0; i<enemies.length; i++)
-	{
-		enemies[i].draw(deltaTime);
-	}	
-
-//enemy updater
-for(var i=0; i<enemies.length; i++)
-	{
-		enemies[i].update(deltaTime);
-	}
-
 }
 
 initialize();
