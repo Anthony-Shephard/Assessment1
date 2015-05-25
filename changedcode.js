@@ -113,3 +113,4 @@ function drawMap()
 
 
 
+context.drawImage(babby, 10 + ((babby.width+2)*i), 20);

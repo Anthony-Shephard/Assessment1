@@ -38,9 +38,11 @@ var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
 var player = new Player();
 var keyboard = new Keyboard();
+var enemy = new Enemy();
 var ENEMY_MAXDX = METER* 5;
 var ENEMY_ACCEL = ENEMY_MAXDX* 2;
 var enemies = [];
+
 var LAYER_COUNT = 6;
 var MAP = { tw: 90, th: 20 };
 var TILE = 35;
@@ -49,6 +51,7 @@ var TILESET_PADDING = 2;
 var TILESET_SPACING = 2;
 var TILESET_COUNT_X = 14;
 var TILESET_COUNT_Y = 14;
+
 var LAYER_BACKGROUND = 0;
 var LAYER_PLATFORMS = 1;
 var LAYER_ROPE = 5;
@@ -56,13 +59,13 @@ var LAYER_CACTUS = 2;
 var LAYER_WATER = 4;
 var LAYER_SIGNS = 3;
 var LAYER_OBJECT_ENEMIES = 6;
-var LAYER_OBJECT_TRIGGERS = 7;
+//var LAYER_OBJECT_TRIGGERS = 7;
+
 var Score = 0;
 var Lives = 3;
 var musicBackground;
 var sfxFire;
-var head = document.createElement ("img");
-	head.src = "head.png";
+
 
 
 
@@ -90,14 +93,11 @@ var fpsCount = 0;
 var fpsTime = 0;
 
 // load an image to draw
-var chuckNorris = document.createElement("img");
-chuckNorris.src = "hero.png";
-
-var baby = document.createElement("img");
-baby.src = "baby.png";
-
 var tileset = document.createElement("img");
 tileset.src = "tileset.png";
+
+var head = document.createElement ("img");
+	head.src = "head.png";
 
 function cellAtPixelCoord(layer, x,y)
 {
@@ -219,6 +219,21 @@ function initialize()
 			}
 		}
 	}
+
+	// add enemies
+	idx = 0;
+	for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++) {
+		for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++) {
+			if(level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0) {
+				var px = tileToPixel(x);
+				var py = tileToPixel(y);
+				var e = new Enemy(px, py);
+				enemies.push(e);
+			}
+			idx++;
+		}
+	} 
+
 	musicBackground = new Howl(
 	{
 		urls: ["background.ogg"],
@@ -237,20 +252,6 @@ function initialize()
 			isSfxPlaying = false;
 		}
 	});
-
-// add enemies
-idx = 0;
-for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++) {
-	for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++) {
-		if(level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0) {
-			var px = tileToPixel(x);
-			var py = tileToPixel(y);
-			var e = new Enemy(px, py);
-			enemies.push(e);
-		}
-		idx++;
-	}
-} 
 }
 
 
@@ -263,22 +264,13 @@ function run()
 
 	player.update(deltaTime);
 
-	drawMap();
-	player.draw();
-
-	//draw enemy
-for(var i=0; i<enemies.length; i++)
-	{
-		enemies[i].draw;
-	}	
-
-//enemy updater
+	//enemy updater
 for(var i=0; i<enemies.length; i++)
 	{
 		enemies[i].update(deltaTime);
 	}
 
-		// update the frame counter 
+	// update the frame counter 
 	fpsTime += deltaTime;
 	fpsCount++;
 	if(fpsTime >= 1)
@@ -286,12 +278,22 @@ for(var i=0; i<enemies.length; i++)
 		fpsTime -= 1;
 		fps = fpsCount;
 		fpsCount = 0;
-	}		
+	}
+
+	drawMap();
+	player.draw();
+
+	//draw enemy
+for(var i=0; i<enemies.length; i++)
+	{
+	 	enemies[i].draw;
+	}			
 		
 	// draw the FPS
 	context.fillStyle = "#f00";
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
+	context.fillText("Enemies : " + enemies.length, 5, 100, 100);
 	
 	// score
 	context.fillStyle = "yellow";
@@ -304,6 +306,8 @@ for(var i=0; i<Lives; i++)
 	{
 	 	context.drawImage(head, 10 + ((head.width+2)*i), 20);
 	}
+
+	
 }
 
 initialize();
