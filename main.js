@@ -36,14 +36,19 @@ function getDeltaTime()
 
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
+
+var position = new Vector2();
 var player = new Player();
 var keyboard = new Keyboard();
 var enemy = new Enemy();
+var bullet = new Bullet();
+
 var ENEMY_MAXDX = METER* 5;
 var ENEMY_ACCEL = ENEMY_MAXDX* 2;
 var enemies = [];
+var bullets = [];
 
-var LAYER_COUNT = 6;
+var LAYER_COUNT = 7;
 var MAP = { tw: 90, th: 20 };
 var TILE = 35;
 var TILESET_TILE = TILE * 2;
@@ -54,20 +59,17 @@ var TILESET_COUNT_Y = 14;
 
 var LAYER_BACKGROUND = 0;
 var LAYER_PLATFORMS = 1;
-var LAYER_ROPE = 5;
-var LAYER_CACTUS = 2;
+var LAYER_ROPE = 3;
+var LAYER_CACTUS = 5;
 var LAYER_WATER = 4;
-var LAYER_SIGNS = 3;
-var LAYER_OBJECT_ENEMIES = 6;
+var LAYER_SIGNS = 6;
+var LAYER_OBJECT_ENEMIES = 2;
 //var LAYER_OBJECT_TRIGGERS = 7;
 
 var Score = 0;
 var Lives = 3;
 var musicBackground;
 var sfxFire;
-
-
-
 
 
 	// abitrary choice for 1m
@@ -222,9 +224,12 @@ function initialize()
 
 	// add enemies
 	idx = 0;
-	for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++) {
-		for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++) {
-			if(level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0) {
+	for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++)
+	{
+		for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++) 
+		{
+			if(level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0) 
+			{
 				var px = tileToPixel(x);
 				var py = tileToPixel(y);
 				var e = new Enemy(px, py);
@@ -254,6 +259,20 @@ function initialize()
 	});
 }
 
+//tests if 2 rectangles are intersecting.
+		//Pass in the x,y coordinates, width and height of each rectangle.
+		//Returns 'true' if the rectangles are intersecting
+	function intersects(x1, y1, w1, h1, x2, y2, w2, h2)
+	{
+		if(y2 + h2 < y1 ||
+			x2 + w2 < x1 ||
+			x2 > x1 + w1 ||
+			y2 > y1 + h1)
+			{
+				return false;
+			}
+			return true;
+	}
 
 function run()
 {
@@ -268,6 +287,40 @@ function run()
 for(var i=0; i<enemies.length; i++)
 	{
 		enemies[i].update(deltaTime);
+	}
+
+	//update bullets and bullet to enemy collision
+	var hit=false;
+for(var i=0; i<bullets.length; i++)
+	{
+		bullets[i].update(deltaTime);
+		
+		if( bullets[i].position.x - worldOffsetX < 0 ||
+			bullets[i].position.x - worldOffsetX > SCREEN_WIDTH)
+		{
+			hit = true;
+		}
+
+	/*	for(var j=0; j<enemies.length; j++)
+		{
+			if(intersects( bullets[i].position.x, bullets[i].position.y, TILE, TILE,
+			 enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true)
+			{
+
+	// kill both the bullet and the enemy
+				enemies.splice(j, 1);
+				hit = true;
+				// increment the player score
+				//score += 1;
+				break;
+			}
+		}
+
+		if(hit == true)
+		{
+			bullets.splice(i, 1);
+			break;
+		}*/
 	}
 
 	// update the frame counter 
@@ -286,15 +339,22 @@ for(var i=0; i<enemies.length; i++)
 	//draw enemy
 for(var i=0; i<enemies.length; i++)
 	{
-	 	enemies[i].draw;
-	}			
+	 	enemies[i].draw(deltaTime);
+	}
+
+	//draw bullet
+for(var i=0; i<bullets.length; i++)
+	{
+	 	bullets[i].draw(deltaTime);
+	}				
 		
 	// draw the FPS
 	context.fillStyle = "#f00";
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
 	context.fillText("Enemies : " + enemies.length, 5, 100, 100);
-	
+	context.fillText("Bullets : " + bullets.length, 5, 130, 100);
+
 	// score
 	context.fillStyle = "yellow";
 	context.font="32px Arial";

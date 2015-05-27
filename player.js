@@ -68,6 +68,11 @@ Player.prototype.update = function(deltaTime)
 		 var left = false;
 		 var right = false;
 		 var jump = false;
+ 		 var wasleft = this.velocity.x < 0;
+		 var wasright = this.velocity.x > 0;
+		 var falling = this.falling;
+		 var ddx = 0; // acceleration
+		 var ddy = GRAVITY;
 
 		// check keypress events
 		 if(keyboard.isKeyDown(keyboard.KEY_LEFT) == true) 
@@ -102,46 +107,65 @@ Player.prototype.update = function(deltaTime)
 		 	}
 		 }
 
-		 if(keyboard.isKeyDown(keyboard.KEY_UP) == true) 
-		 {
-		 	jump = true;
-		 }
+		if(keyboard.isKeyDown(keyboard.KEY_UP) == true) 
+		{
+			jump = true;
+		}
 
-		 if(this.cooldownTimer > 0)
-		 {
-		 	this.cooldownTimer -= deltaTime;
-		 }
-		 if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true && this.cooldownTimer <= 0)
-		 {
+		if(this.cooldownTimer > 0)
+		{
+			this.cooldownTimer -= deltaTime;
+		}
+
+		if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true && this.cooldownTimer <= 0)
+		{
 		 	sfxFire.play();
 		 	this.cooldownTimer = 0.3;
 
+		 		if(this.direction == LEFT)
+		 		{
+		 			if(this.sprite.currentAnimation != ANIM_SHOOT_LEFT)
+		 			this.sprite.setAnimation(ANIM_SHOOT_LEFT);
+		 		}
+		 		else
+		 		{
+		 			if(this.sprite.currentAnimation != ANIM_SHOOT_RIGHT)
+		 			this.sprite.setAnimation(ANIM_SHOOT_RIGHT);
+		 		}
+		 	
 		 	//shoot a bullet
-		 }
+		 	var tempBullet =  new Bullet();
+		 	this.moveRight = right;
+	 	if(this.right == true)
+		 	{
+		 		this.velocity.Set(MAXDX *2, 0);
+		 	}
+		 	else
+		 	{
+		 		this.velocity.Set(-MAXDX *2, 0);
+		 	}
+	 	this.cooldownTimer = 0.5;
+	 	bullets.push(tempBullet);
 
-		 var wasleft = this.velocity.x < 0;
-		 var wasright = this.velocity.x > 0;
-		 var falling = this.falling;
-		 var ddx = 0; // acceleration
-		 var ddy = GRAVITY;
+		}
 
-		 if (left)
+		if (left)
 		 	ddx = ddx - ACCEL; // player wants to go left
-		 else if (wasleft)
+		else if (wasleft)
 		 	ddx = ddx + FRICTION; // player was going left, but not any more
-		 if (right)
+		if (right)
 		 	ddx = ddx + ACCEL; // player wants to go right
-		 else if (wasright)
+		else if (wasright)
 		 	ddx = ddx - FRICTION; // player was going right, but not any more
-		 if (jump && !this.jumping && !falling)
-		 {
-			 ddy = ddy - JUMP; // apply an instantaneous (large) vertical impulse
-			 this.jumping = true;
-			 if(this.direction == LEFT)
+		if (jump && !this.jumping && !falling)
+		{
+			ddy = ddy - JUMP; // apply an instantaneous (large) vertical impulse
+			this.jumping = true;
+			if(this.direction == LEFT)
 			 	this.sprite.setAnimation(ANIM_JUMP_LEFT)
-			 else
+			else
 			 	this.sprite.setAnimation(ANIM_JUMP_RIGHT)
-		 }
+		} 
 
 		 // calculate the new position and velocity:
 		 this.position.y = Math.floor(this.position.y + (deltaTime * this.velocity.y));

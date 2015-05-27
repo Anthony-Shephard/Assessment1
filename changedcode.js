@@ -111,6 +111,25 @@ function drawMap()
 	 }
 }
 
+//collision highlighter
+function DrawTileLayer(layer)
+{
+        for( var y = 0; y < level1.layers[layer].height;  y++ )
+        {
+                for( var x = 0; x < level1.layers[layer].width;  x++ )
+                {
+                        if(cells[layer][y][x] == 1)
+                        {
+                                context.fillStyle = "#c0c";            
+                                context.fillRect(35*x, 35*y, 35, 35);                  
+                        }
+                }
+        }
+}
+
 
 
 context.drawImage(babby, 10 + ((babby.width+2)*i), 20);
+
+this.sprite.buildAnimation(2, 1, 88, 94, 0.3, [0,1]);
+	this.sprite.setAnimationOffset(0, -35, -40);
