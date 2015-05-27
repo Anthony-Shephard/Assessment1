@@ -134,7 +134,7 @@ Player.prototype.update = function(deltaTime)
 		 		}
 		 	
 		 	//shoot a bullet
-		 	var tempBullet =  new Bullet();
+		 	var tempBullet =  new Bullet(this.position.x +80, this.position.y);
 		 	this.moveRight = right;
 	 	if(this.right == true)
 		 	{
@@ -142,7 +142,7 @@ Player.prototype.update = function(deltaTime)
 		 	}
 		 	else
 		 	{
-		 		this.velocity.Set(-MAXDX *2, 0);
+		 		this.velocity.Set(-MAXDX *0, 0);
 		 	}
 	 	this.cooldownTimer = 0.5;
 	 	bullets.push(tempBullet);

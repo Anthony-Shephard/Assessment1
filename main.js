@@ -48,7 +48,7 @@ var ENEMY_ACCEL = ENEMY_MAXDX* 2;
 var enemies = [];
 var bullets = [];
 
-var LAYER_COUNT = 7;
+var LAYER_COUNT = 6;
 var MAP = { tw: 90, th: 20 };
 var TILE = 35;
 var TILESET_TILE = TILE * 2;

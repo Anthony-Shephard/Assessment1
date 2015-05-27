@@ -2,7 +2,7 @@ var Enemy = function(x, y)
 {
 	this.sprite = new Sprite("bat.png");
 	this.sprite.buildAnimation(2, 1, 88, 94, 0.3, [0,1]);
-	this.sprite.setAnimationOffset(0, -35, -40);
+	this.sprite.setAnimationOffset(0, 0, 0);
 
 	this.position = new Vector2();
 	this.position.Set(x, y);
