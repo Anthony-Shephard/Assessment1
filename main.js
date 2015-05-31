@@ -29,49 +29,35 @@ function getDeltaTime()
 
 //-------------------- Don't modify anything above here
 
-
-
-
-
-
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
+
+// load an image to draw
+var tileset = document.createElement("img");
+tileset.src = "tileset.png";
+
+// some variables to calculate the Frames Per Second (FPS - this tells use
+// how fast our game is running, and allows us to make the game run at a 
+// constant speed)
+var fps = 0;
+var fpsCount = 0;
+var fpsTime = 0;
 
 var position = new Vector2();
 var player = new Player();
 var keyboard = new Keyboard();
 var enemy = new Enemy();
 var bullet = new Bullet();
+var blood = new Blood();
 
-var ENEMY_MAXDX = METER* 5;
-var ENEMY_ACCEL = ENEMY_MAXDX* 2;
-var enemies = [];
-var bullets = [];
-
-var LAYER_COUNT = 6;
-var MAP = { tw: 90, th: 20 };
-var TILE = 35;
-var TILESET_TILE = TILE * 2;
-var TILESET_PADDING = 2;
-var TILESET_SPACING = 2;
-var TILESET_COUNT_X = 14;
-var TILESET_COUNT_Y = 14;
-
-var LAYER_BACKGROUND = 0;
-var LAYER_PLATFORMS = 1;
-var LAYER_ROPE = 3;
-var LAYER_CACTUS = 5;
-var LAYER_WATER = 4;
-var LAYER_SIGNS = 6;
-var LAYER_OBJECT_ENEMIES = 2;
-//var LAYER_OBJECT_TRIGGERS = 7;
-
-var Score = 0;
+//HUD
+var score = 0;
 var Lives = 3;
-var musicBackground;
-var sfxFire;
+var head = document.createElement ("img");
+	head.src = "head.png";
 
-
+	//SET TILE
+var TILE = 35;
 	// abitrary choice for 1m
 var METER = TILE;
  	// very exaggerated gravity (6x)
@@ -87,19 +73,30 @@ var FRICTION = MAXDX * 6;
  	// (a large) instantaneous jump impulse
 var JUMP = METER * 1500;
 
-// some variables to calculate the Frames Per Second (FPS - this tells use
-// how fast our game is running, and allows us to make the game run at a 
-// constant speed)
-var fps = 0;
-var fpsCount = 0;
-var fpsTime = 0;
+var LAYER_BACKGROUND = 0;
+var LAYER_PLATFORMS = 1;
+var LAYER_ROPE = 2;
+var LAYER_WATER = 3;
+var LAYER_EXTRAS = 4;
+var LAYER_OBJECT_ENEMIES = 5;
+var LAYER_OBJECT_TRIGGERS = 6;
+var LAYER_COUNT = 4;
 
-// load an image to draw
-var tileset = document.createElement("img");
-tileset.src = "tileset.png";
+var MAP = { tw:90, th:20 };
+var TILESET_TILE = TILE * 2;
+var TILESET_PADDING = 2;
+var TILESET_SPACING = 2;
+var TILESET_COUNT_X = 14;
+var TILESET_COUNT_Y = 14;
 
-var head = document.createElement ("img");
-	head.src = "head.png";
+var ENEMY_MAXDX = METER* 5;
+var ENEMY_ACCEL = ENEMY_MAXDX* 2;
+var enemies = [];
+var bullets = [];
+var bloods = [];
+
+var musicBackground;
+var sfxFire;
 
 function cellAtPixelCoord(layer, x,y)
 {
@@ -239,6 +236,23 @@ function initialize()
 		}
 	} 
 
+	//add ROPE
+	idx = 0;
+	for(var y = 0; y < level1.layers[LAYER_ROPE].height; y++)
+	{
+		for(var x = 0; x < level1.layers[LAYER_ROPE].width; x++)
+		{
+			if(level1.layers[LAYER_ROPE].data[idx] != 0)
+			{
+				var px = tileToPixel(x);
+				var py = tileToPixel(y);
+				var e = new Player(px, py);
+			}
+			idx++;
+		}
+	}
+	
+
 	musicBackground = new Howl(
 	{
 		urls: ["background.ogg"],
@@ -289,10 +303,17 @@ for(var i=0; i<enemies.length; i++)
 		enemies[i].update(deltaTime);
 	}
 
+	//blood updater
+for(var i=0; i<bloods.length; i++)
+	{
+		bloods[i].update(deltaTime);
+	}
+
 	//update bullets and bullet to enemy collision
 	var hit=false;
 for(var i=0; i<bullets.length; i++)
 	{
+		var pos = enemies[i].pos;
 		bullets[i].update(deltaTime);
 		
 		if( bullets[i].position.x - worldOffsetX < 0 ||
@@ -301,7 +322,7 @@ for(var i=0; i<bullets.length; i++)
 			hit = true;
 		}
 
-	/*	for(var j=0; j<enemies.length; j++)
+		for(var j=0; j<enemies.length; j++)
 		{
 			if(intersects( bullets[i].position.x, bullets[i].position.y, TILE, TILE,
 			 enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true)
@@ -311,7 +332,8 @@ for(var i=0; i<bullets.length; i++)
 				enemies.splice(j, 1);
 				hit = true;
 				// increment the player score
-				//score += 1;
+				score += 1;
+				bloods.push();
 				break;
 			}
 		}
@@ -320,8 +342,27 @@ for(var i=0; i<bullets.length; i++)
 		{
 			bullets.splice(i, 1);
 			break;
-		}*/
+		}
 	}
+
+
+		// player collision
+		var hit=false;
+		for(var j=0; j<enemies.length; j++)
+		{
+			if(intersects( player.position.x, player.position.y, TILE, TILE,
+			 enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true)
+			{
+
+	// kill  player 
+				hit = true;
+				Player.isDead == true;
+				// increment the player score
+				//score + 1;
+				break;
+			}
+		}
+
 
 	// update the frame counter 
 	fpsTime += deltaTime;
@@ -346,20 +387,24 @@ for(var i=0; i<enemies.length; i++)
 for(var i=0; i<bullets.length; i++)
 	{
 	 	bullets[i].draw(deltaTime);
+	}
+
+	//draw blood
+for(var i=0; i<bloods.length; i++)
+	{
+	 	bloods[i].draw(deltaTime);
 	}				
 		
 	// draw the FPS
 	context.fillStyle = "#f00";
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
-	context.fillText("Enemies : " + enemies.length, 5, 100, 100);
-	context.fillText("Bullets : " + bullets.length, 5, 130, 100);
-
+	
 	// score
 	context.fillStyle = "yellow";
 	context.font="32px Arial";
-	var scoreText = "Score: " + Score;
-	context.fillText(scoreText, SCREEN_WIDTH - 1080, 470);
+	var scoreText = "Score: " + score;
+	context.fillText(scoreText, SCREEN_WIDTH - 630, 570);
 
 	// life counter
 for(var i=0; i<Lives; i++)

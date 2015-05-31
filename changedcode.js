@@ -1,50 +1,9 @@
 
-// from enemy.js
-Enemy.prototype.update = function(deltaTime)
-	{
-		if( typeof(this.rotation) == "undefined" )
-		this.rotation = 0; // hang on, where did this variable come from!
-
-	if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true)
-	{
-		this.rotation += deltaTime;
-	}
-	else
-	{
-		this.rotation -= deltaTime;
-	}
-}
-
-player/enemy
-this.position = Vector2();
-
-this.offset = new Vector2 ();
-		this.offset.set(-55,-87);
-
-				this.velocityX = 0;
-		this.velocityXY = 0;
-		this.angularVelocity = 0;
-		this.rotation = 0;
 
 
-DrawCellCollision();
 
-function DrawCellCollision() {    
-    for(var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++)
-        {
-                // initialize the collision map
-        for(var y = 0; y < level1.layers[layerIdx].height; y++) {        
-            for(var x = 0; x < level1.layers[layerIdx].width; x++) {
- 
-                                if(cells[layerIdx][y][x] > 0)
-                                {
-                                        context.fillStyle = "#c0c";            
-                                        context.fillRect(35*x, 35*y, 35, 35);
-                                }
-            }
-        }  
-    }
-}
+
+
 
 
 //player draw function
@@ -134,6 +93,29 @@ context.drawImage(babby, 10 + ((babby.width+2)*i), 20);
 this.sprite.buildAnimation(2, 1, 88, 94, 0.3, [0,1]);
 	this.sprite.setAnimationOffset(0, -35, -40);
 
-//bullet
 
-		
+
+// check if things are loading
+context.fillText("Enemies : " + enemies.length, 5, 100, 100);
+	context.fillText("Bullets : " + bullets.length, 5, 130, 100);
+
+
+
+
+	Player.prototype.gameStateClimb = function(deltaTime)
+	{
+		if(this.falling == false && this.right == false && this.left == false)
+		{
+			if(keyboard.isKeyDown(keyboard.KEY_UP) == true)
+			{
+				climb = true;
+				{
+					if(this.sprite.currentAnimation != ANIM_CLIMB)
+						this.sprite.setAnimation(ANIM_CLIMB);
+					{
+						this.velocity.y = 0;
+					}
+				}
+			}
+		}
+	}

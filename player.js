@@ -12,6 +12,11 @@ var ANIM_WALK_RIGHT = 7;
 var ANIM_SHOOT_RIGHT = 8;
 var ANIM_MAX = 9;
 
+// player game states
+var STATE_CLIMB = 0
+var STATE_JUMP = 1
+var gameState = STATE_CLIMB;
+
 var Player = function() 
 	{
 		this.sprite = new Sprite("ChuckNorris.png");					
@@ -61,6 +66,40 @@ var Player = function()
 		this.cooldownTimer = 0;
 	};
 
+	Player.prototype.gameStateJump = function(deltaTime)
+	{
+		if(this.falling == false && climb == false)
+		{
+			if(keyboard.isKeyDown(keyboard.KEY_UP) == true)
+			{
+				jump = true;
+			}
+		}
+	}
+
+	Player.prototype.gameStateClimb = function(deltaTime)
+	{
+		if(this.falling == false && this.right == false && this.left == false)
+		{
+			var tx = pixelToTile(this.position.x);
+			var ty = pixelToTile(this.position.y);
+			var cell = cellAtTileCoord(LAYER_ROPE, tx, ty);
+			var cellright = cellAtTileCoord(LAYER_ROPE, tx + 1, ty);
+			var celldown = cellAtTileCoord(LAYER_ROPE, tx, ty + 1);
+			var celldiag = cellAtTileCoord(LAYER_ROPE, tx + 1, ty + 1);
+			if(cell != 0 || cellright != 0)
+			{
+				if(keyboard.isKeyDown(keyboard.KEY_UP) == true)
+				{
+					climb = true
+					gameState = STATE_CLIMB;
+					if(this.sprite.currentAnimation != ANIM_CLIMB)
+						this.sprite.setAnimation(ANIM_CLIMB);
+				}
+			}
+		}
+	}
+
 Player.prototype.update = function(deltaTime)
 	{
 		this.sprite.update(deltaTime);
@@ -68,6 +107,7 @@ Player.prototype.update = function(deltaTime)
 		 var left = false;
 		 var right = false;
 		 var jump = false;
+		 var climb = false;
  		 var wasleft = this.velocity.x < 0;
 		 var wasright = this.velocity.x > 0;
 		 var falling = this.falling;
@@ -117,32 +157,42 @@ Player.prototype.update = function(deltaTime)
 			this.cooldownTimer -= deltaTime;
 		}
 
+		switch(gameState)
+		{
+			case STATE_JUMP:
+				player.gameStateJump(deltaTime);
+					break;
+			case STATE_CLIMB:
+				player.gameStateClimb(deltaTime);
+					break;
+		}
+
 		if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true && this.cooldownTimer <= 0)
 		{
 		 	sfxFire.play();
 		 	this.cooldownTimer = 0.3;
 
-		 		if(this.direction == LEFT)
+		 		if(this.direction == RIGHT)
 		 		{
 		 			if(this.sprite.currentAnimation != ANIM_SHOOT_LEFT)
-		 			this.sprite.setAnimation(ANIM_SHOOT_LEFT);
+		 				this.sprite.setAnimation(ANIM_SHOOT_LEFT);
 		 		}
 		 		else
 		 		{
 		 			if(this.sprite.currentAnimation != ANIM_SHOOT_RIGHT)
-		 			this.sprite.setAnimation(ANIM_SHOOT_RIGHT);
+		 				this.sprite.setAnimation(ANIM_SHOOT_RIGHT);
 		 		}
 		 	
 		 	//shoot a bullet
-		 	var tempBullet =  new Bullet(this.position.x +80, this.position.y);
-		 	this.moveRight = right;
-	 	if(this.right == true)
+		 	var tempBullet =  new Bullet(this.position.x, this.position.y);
+		 	var moveRight = right;
+	 	if(this.moveRight == true)
 		 	{
-		 		this.velocity.Set(MAXDX *2, 0);
+		 		this.velocity.Set(-MAXDX *2, 0);
 		 	}
 		 	else
 		 	{
-		 		this.velocity.Set(-MAXDX *0, 0);
+		 		this.velocity.Set(MAXDX *0, 0);
 		 	}
 	 	this.cooldownTimer = 0.5;
 	 	bullets.push(tempBullet);
