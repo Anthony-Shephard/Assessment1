@@ -52,7 +52,8 @@ var blood = new Blood();
 
 //HUD
 var score = 0;
-var Lives = 3;
+var lives = 3;
+
 var head = document.createElement ("img");
 	head.src = "head.png";
 
@@ -80,7 +81,7 @@ var LAYER_WATER = 3;
 var LAYER_EXTRAS = 4;
 var LAYER_OBJECT_ENEMIES = 5;
 var LAYER_OBJECT_TRIGGERS = 6;
-var LAYER_COUNT = 4;
+var LAYER_COUNT = 5;
 
 var MAP = { tw:90, th:20 };
 var TILESET_TILE = TILE * 2;
@@ -97,7 +98,18 @@ var bloods = [];
 
 var musicBackground;
 var sfxFire;
+var sfxPain;
+var sfxZombie;
 
+// GAME STATE VARIABLES
+var STATE_SPLASH = 4;
+var STATE_GAME = 5;
+var STATE_GAMEOVER = 6;
+
+var gameState = STATE_SPLASH;
+var splashTimer = 3;
+
+//
 function cellAtPixelCoord(layer, x,y)
 {
 	if(x<0 || x>SCREEN_WIDTH || y<0)
@@ -161,7 +173,7 @@ function drawMap()
 		}
 	if(startX > MAP.tw - maxTiles)
 		{
-			startX = MAP.tw - maxTiles + 1;
+			startX = MAP.tw - maxTiles +1;
 			offsetX = TILE;
 		}
 
@@ -219,6 +231,30 @@ function initialize()
 		}
 	}
 
+	// initialize trigger layer in collision map
+	cells[LAYER_OBJECT_TRIGGERS] = [];
+	idx = 0;
+		for(var y = 0; y < level1.layers[LAYER_OBJECT_TRIGGERS].height; y++) 
+		{
+			cells[LAYER_OBJECT_TRIGGERS][y] = [];
+			for(var x = 0; x < level1.layers[LAYER_OBJECT_TRIGGERS].width; x++) 
+			{
+				if(level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] != 0) 
+				{
+					cells[LAYER_OBJECT_TRIGGERS][y][x] = 1;
+					cells[LAYER_OBJECT_TRIGGERS][y-1][x] = 1;
+					cells[LAYER_OBJECT_TRIGGERS][y-1][x+1] = 1;
+					cells[LAYER_OBJECT_TRIGGERS][y][x+1] = 1;
+				}
+		else if(cells[LAYER_OBJECT_TRIGGERS][y][x] != 1) 
+			{
+				// if we haven't set this cell's value, then set it to 0 now
+				cells[LAYER_OBJECT_TRIGGERS][y][x] = 0;
+			}
+			idx++;
+		}
+	}
+
 	// add enemies
 	idx = 0;
 	for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++)
@@ -236,7 +272,7 @@ function initialize()
 		}
 	} 
 
-	//add ROPE
+/*	//add ROPE
 	idx = 0;
 	for(var y = 0; y < level1.layers[LAYER_ROPE].height; y++)
 	{
@@ -251,7 +287,7 @@ function initialize()
 			idx++;
 		}
 	}
-	
+*/	
 
 	musicBackground = new Howl(
 	{
@@ -265,6 +301,26 @@ function initialize()
 	sfxFire = new Howl(
 	{
 		urls: ["fireEffect.ogg"],
+		buffer: true,
+		volume: 1,
+		onend: function() {
+			isSfxPlaying = false;
+		}
+	});
+
+	sfxPain = new Howl(
+	{
+		urls: ["Pain.ogg"],
+		buffer: true,
+		volume: 1,
+		onend: function() {
+			isSfxPlaying = false;
+		}
+	});
+
+	sfxZombie = new Howl(
+	{
+		urls: ["Zombie.ogg"],
 		buffer: true,
 		volume: 1,
 		onend: function() {
@@ -303,12 +359,6 @@ for(var i=0; i<enemies.length; i++)
 		enemies[i].update(deltaTime);
 	}
 
-	//blood updater
-for(var i=0; i<bloods.length; i++)
-	{
-		bloods[i].update(deltaTime);
-	}
-
 	//update bullets and bullet to enemy collision
 	var hit=false;
 for(var i=0; i<bullets.length; i++)
@@ -327,15 +377,15 @@ for(var i=0; i<bullets.length; i++)
 			if(intersects( bullets[i].position.x, bullets[i].position.y, TILE, TILE,
 			 enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true)
 			{
-
-	// kill both the bullet and the enemy
+		// kill both the bullet and the enemy
 				enemies.splice(j, 1);
 				hit = true;
 				// increment the player score
-				score += 1;
+				score += 10;
+				sfxZombie.play()
 				bloods.push();
-				break;
-			}
+				break;	
+			}	
 		}
 
 		if(hit == true)
@@ -346,23 +396,25 @@ for(var i=0; i<bullets.length; i++)
 	}
 
 
-		// player collision
+/*		// player collision
 		var hit=false;
 		for(var j=0; j<enemies.length; j++)
 		{
-			if(intersects( player.position.x, player.position.y, TILE, TILE,
+			if(intersects( player.position.x, player.position.y, player.height/2, player.width/2,
 			 enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true)
 			{
 
 	// kill  player 
 				hit = true;
-				Player.isDead == true;
-				// increment the player score
-				//score + 1;
+				player.isDead == true;
+				lives -= 1;
+				player.position.Set(1*35, 10*35)
+				score -= 5;
+				sfxPain.play()
 				break;
 			}
 		}
-
+*/
 
 	// update the frame counter 
 	fpsTime += deltaTime;
@@ -387,13 +439,7 @@ for(var i=0; i<enemies.length; i++)
 for(var i=0; i<bullets.length; i++)
 	{
 	 	bullets[i].draw(deltaTime);
-	}
-
-	//draw blood
-for(var i=0; i<bloods.length; i++)
-	{
-	 	bloods[i].draw(deltaTime);
-	}				
+	}		
 		
 	// draw the FPS
 	context.fillStyle = "#f00";
@@ -407,7 +453,7 @@ for(var i=0; i<bloods.length; i++)
 	context.fillText(scoreText, SCREEN_WIDTH - 630, 570);
 
 	// life counter
-for(var i=0; i<Lives; i++)
+for(var i=0; i<lives; i++)
 	{
 	 	context.drawImage(head, 10 + ((head.width+2)*i), 20);
 	}

@@ -13,9 +13,9 @@ var ANIM_SHOOT_RIGHT = 8;
 var ANIM_MAX = 9;
 
 // player game states
-var STATE_CLIMB = 0
-var STATE_JUMP = 1
-var gameState = STATE_CLIMB;
+//var STATE_CLIMB = 0
+//var STATE_JUMP = 1
+//var gameState = STATE_CLIMB;
 
 var Player = function() 
 	{
@@ -55,7 +55,7 @@ var Player = function()
 		}
 
 		this.position = new Vector2 ();
-		this.position.Set(1*35, 5*35);
+		this.position.Set(0.5*35, 10*35);
 		this.width = 159;
 		this.height = 163;
 		this.velocity = new Vector2 ();
@@ -66,7 +66,7 @@ var Player = function()
 		this.cooldownTimer = 0;
 	};
 
-	Player.prototype.gameStateJump = function(deltaTime)
+	/*Player.prototype.gameStateJump = function(deltaTime)
 	{
 		if(this.falling == false && climb == false)
 		{
@@ -77,29 +77,14 @@ var Player = function()
 		}
 	}
 
-	Player.prototype.gameStateClimb = function(deltaTime)
-	{
-		if(this.falling == false && this.right == false && this.left == false)
-		{
-			var tx = pixelToTile(this.position.x);
-			var ty = pixelToTile(this.position.y);
-			var cell = cellAtTileCoord(LAYER_ROPE, tx, ty);
-			var cellright = cellAtTileCoord(LAYER_ROPE, tx + 1, ty);
-			var celldown = cellAtTileCoord(LAYER_ROPE, tx, ty + 1);
-			var celldiag = cellAtTileCoord(LAYER_ROPE, tx + 1, ty + 1);
-			if(cell != 0 || cellright != 0)
+	// climb code???
+	var climb_up = false;
+	var climb_down = false;
+	if(keyboard.isKeyDown(keyboard.KEY_UP) == true)
 			{
-				if(keyboard.isKeyDown(keyboard.KEY_UP) == true)
-				{
-					climb = true
-					gameState = STATE_CLIMB;
-					if(this.sprite.currentAnimation != ANIM_CLIMB)
-						this.sprite.setAnimation(ANIM_CLIMB);
-				}
+				climb_up = true;
 			}
-		}
-	}
-
+*/
 Player.prototype.update = function(deltaTime)
 	{
 		this.sprite.update(deltaTime);
@@ -157,7 +142,7 @@ Player.prototype.update = function(deltaTime)
 			this.cooldownTimer -= deltaTime;
 		}
 
-		switch(gameState)
+	/*	switch(gameState)
 		{
 			case STATE_JUMP:
 				player.gameStateJump(deltaTime);
@@ -166,35 +151,38 @@ Player.prototype.update = function(deltaTime)
 				player.gameStateClimb(deltaTime);
 					break;
 		}
-
+*/
 		if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true && this.cooldownTimer <= 0)
 		{
 		 	sfxFire.play();
 		 	this.cooldownTimer = 0.3;
 
-		 		if(this.direction == RIGHT)
+		 		var tempBullet = new Bullet((this.position.x), this.position.y);
+		 		if(this.direction == LEFT)
 		 		{
+		 			left = true;
 		 			if(this.sprite.currentAnimation != ANIM_SHOOT_LEFT)
 		 				this.sprite.setAnimation(ANIM_SHOOT_LEFT);
 		 		}
 		 		else
 		 		{
+		 			right = true;
 		 			if(this.sprite.currentAnimation != ANIM_SHOOT_RIGHT)
 		 				this.sprite.setAnimation(ANIM_SHOOT_RIGHT);
 		 		}
 		 	
-		 	//shoot a bullet
-		 	var tempBullet =  new Bullet(this.position.x, this.position.y);
-		 	var moveRight = right;
-	 	if(this.moveRight == true)
+		 	if(right == true)
 		 	{
-		 		this.velocity.Set(-MAXDX *2, 0);
+		 		tempBullet.velocity.x = 400;	//set direction
+		 		tempBullet.position.x += 80;	//set position of bullet to make it come out of gun not pants
 		 	}
 		 	else
 		 	{
-		 		this.velocity.Set(MAXDX *0, 0);
+		 		tempBullet.velocity.x = -400;	//set direction
+		 		tempBullet.position.x -= 50;	//set position of bullet to make it come out of gun not pants
 		 	}
-	 	this.cooldownTimer = 0.5;
+
+	 	cooldownTimer = 0.5;
 	 	bullets.push(tempBullet);
 
 		}
@@ -294,7 +282,50 @@ Player.prototype.update = function(deltaTime)
 				this.velocity.x = 0; // stop horizontal velocity
 			}
 		}
+/*			//climbing update code????
+	Player.prototype.gameStateClimb = function(deltaTime)
+	{
+	if(this.falling == false && this.right == false && this.left == false)
+		{
+			var tx = pixelToTile(this.position.x);
+			var ty = pixelToTile(this.position.y);
+			var cell = cellAtTileCoord(LAYER_ROPE, tx, ty);
+			var cellright = cellAtTileCoord(LAYER_ROPE, tx + 1, ty);
+			var celldown = cellAtTileCoord(LAYER_ROPE, tx, ty + 1);
+			var celldiag = cellAtTileCoord(LAYER_ROPE, tx + 1, ty + 1);
+			if(cell != 0 || cellright != 0)
+			{
+				if(keyboard.isKeyDown(keyboard.KEY_UP) == true)
+				{
+					climb = true
+					gameState = STATE_CLIMB;
+					if(this.sprite.currentAnimation != ANIM_CLIMB)
+						this.sprite.setAnimation(ANIM_CLIMB);
+				}
+			}
+
+			if(cell != 0 || cellright != 0)
+			{
+				if(keyboard.isKeyDown(keyboard.KEY_DOWN) == true)
+				{
+					climb = true
+					gameState = STATE_CLIMB;
+					if(this.sprite.currentAnimation != ANIM_CLIMB)
+						this.sprite.setAnimation(ANIM_CLIMB);
+				}
+			}
+		}*/
+
+		if(cellAtTileCoord(LAYER_OBJECT_TRIGGERS, tx, ty) == true)
+		{
+			context.fillStyle = "red";
+			context.font="32px Arial";
+			
+			context.fillText("GAME OVER", SCREEN_WIDTH - 630, 570);
+		}
 	}
+
+
 
 Player.prototype.draw = function()
 	{

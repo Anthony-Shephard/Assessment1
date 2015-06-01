@@ -21,6 +21,8 @@ var Enemy = function(x, y)
 	
 	this.moveRight = true;
 	this.pause = 0;
+
+	this.isDead = false;
 }
 
 Enemy.prototype.update = function(dt)
