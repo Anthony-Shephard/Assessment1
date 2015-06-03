@@ -121,17 +121,7 @@ context.fillText("Enemies : " + enemies.length, 5, 100, 100);
 	}
 
 
-
-	function invert(){
-        if (vector == false){
-        player.image.src = "player.png";
-        }
-        else {
-        player.image.src = "player.png";
-        }
-        if (vector == false){
-        backgroundImage.src = "bg5.png";
-        }
-        else {
-        backgroundImage.src = "planet.png";
-        }
+			if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true) 
+		{
+		 	gameState = STATE_GAME
+		}

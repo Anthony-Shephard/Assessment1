@@ -3,8 +3,8 @@ attribution
 zombie.ogg
 Pain.ogg
 
-// Enchantedhandswordpress.com
-bullet.png
+//Platforge, Hannah Cohan, Stafford McIntire
+Bullet.png
 
 // Knightyamato
 baby.png

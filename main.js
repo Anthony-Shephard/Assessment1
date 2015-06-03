@@ -107,9 +107,9 @@ var STATE_GAME = 5;
 var STATE_GAMEOVER = 6;
 
 var gameState = STATE_SPLASH;
-var splashTimer = 3;
+var splashTimer = 30000;
 
-//
+
 function cellAtPixelCoord(layer, x,y)
 {
 	if(x<0 || x>SCREEN_WIDTH || y<0)
@@ -294,7 +294,7 @@ function initialize()
 		urls: ["background.ogg"],
 		loop: true,
 		buffer: true,
-		volume: 0.0
+		volume: 0.3
 	});
 	musicBackground.play();
 
@@ -312,7 +312,7 @@ function initialize()
 	{
 		urls: ["Pain.ogg"],
 		buffer: true,
-		volume: 1,
+		volume: 0.7,
 		onend: function() {
 			isSfxPlaying = false;
 		}
@@ -322,7 +322,7 @@ function initialize()
 	{
 		urls: ["Zombie.ogg"],
 		buffer: true,
-		volume: 1,
+		volume: 0.7,
 		onend: function() {
 			isSfxPlaying = false;
 		}
@@ -344,12 +344,58 @@ function initialize()
 			return true;
 	}
 
-function run()
+function run() 
+{
+	var deltaTime = getDeltaTime();
+
+		switch (gameState)
+		{
+			case STATE_SPLASH:
+					runSplash(deltaTime);
+					break;
+			case STATE_GAME:
+					runGame(deltaTime);
+					break;
+			case STATE_GAMEOVER:
+					runGameOver(deltaTime);
+					break;
+		}
+}
+
+function runSplash(deltaTime)
+	{
+		splashTimer -= deltaTime;
+		if(splashTimer <=0 ||
+			(keyboard.isKeyDown(keyboard.KEY_SPACE) == true)  )
+		{
+			gameState = STATE_GAME;
+			return;
+		}
+		
+		var startImage = document.createElement ("img");
+			startImage.src = "start.png";
+		var controlImage = document.createElement ("img");
+			controlImage.src = "control.png";
+
+		context.drawImage (startImage, 0, 0);
+		context.font =  "20pt Calibri";
+		
+		context.fillText ("Hold ENTER For Controls", 180, 400)
+		context.fillText ("Press SPACE To Begin", 200, 440)
+		context.fillStyle = 'green';
+
+		 if(keyboard.isKeyDown(keyboard.KEY_ENTER) == true) 
+		{
+		 	context.drawImage (controlImage, 0, 0);
+		}
+	}
+
+function runGame(deltaTime)
 {
 	context.fillStyle = "#ccc";		
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
-	var deltaTime = getDeltaTime();
+	
 
 	player.update(deltaTime);
 
@@ -395,8 +441,15 @@ for(var i=0; i<bullets.length; i++)
 		}
 	}
 
+	if(player.position.y > SCREEN_HEIGHT)
+		{
+			lives -= 1;
+			player.position.Set(1*35, 10*35)
+			sfxPain.play()
+		}
 
-/*		// player collision
+
+	// player collision
 		var hit=false;
 		for(var j=0; j<enemies.length; j++)
 		{
@@ -414,7 +467,11 @@ for(var i=0; i<bullets.length; i++)
 				break;
 			}
 		}
-*/
+
+		if(lives <= 0)
+				{
+					gameState = STATE_GAMEOVER;
+				}
 
 	// update the frame counter 
 	fpsTime += deltaTime;
@@ -455,11 +512,32 @@ for(var i=0; i<bullets.length; i++)
 	// life counter
 for(var i=0; i<lives; i++)
 	{
-	 	context.drawImage(head, 10 + ((head.width+2)*i), 20);
+	 	context.drawImage(head, 10 + ((head.width+2)*i), 35);
+	}         
+}
+
+function runGameOver(deltaTime)
+	{
+		/*if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true)
+		{
+			player.position.Set(0.5*35, 10*35);
+			lives = 3;
+			score = 0;
+			enemies.splice(13, enemies.length);
+			enemies = []
+			gameState = STATE_GAME;
+		}
+*/
+		var gameOverImage = document.createElement ("img");
+		gameOverImage.src = "gameover.png";
+		context.drawImage (gameOverImage,0 ,0);
+	
+		context.font =  "30px Arial";
+		context.fillText("Total Score "+ score, 200, 400);
+		context.fillText ("Refresh To Restart", 130, 440)
+		context.fillStyle = 'green';
 	}
 
-	
-}
 
 initialize();
 

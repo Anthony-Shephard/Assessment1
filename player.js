@@ -152,12 +152,13 @@ Player.prototype.update = function(deltaTime)
 					break;
 		}
 */
+		//Shoot a bullet
 		if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true && this.cooldownTimer <= 0)
 		{
 		 	sfxFire.play();
 		 	this.cooldownTimer = 0.3;
 
-		 		var tempBullet = new Bullet((this.position.x), this.position.y);
+	 		var tempBullet = new Bullet((this.position.x), this.position.y);
 		 		if(this.direction == LEFT)
 		 		{
 		 			left = true;
@@ -316,12 +317,9 @@ Player.prototype.update = function(deltaTime)
 			}
 		}*/
 
-		if(cellAtTileCoord(LAYER_OBJECT_TRIGGERS, tx, ty) == true)
+	if(cellAtTileCoord(LAYER_OBJECT_TRIGGERS, tx, ty)== true)
 		{
-			context.fillStyle = "red";
-			context.font="32px Arial";
-			
-			context.fillText("GAME OVER", SCREEN_WIDTH - 630, 570);
+			gameState = STATE_GAMEOVER;
 		}
 	}
 
