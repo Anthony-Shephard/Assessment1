@@ -444,7 +444,7 @@ for(var i=0; i<bullets.length; i++)
 	if(player.position.y > SCREEN_HEIGHT)
 		{
 			lives -= 1;
-			player.position.Set(1*35, 10*35)
+			player.position.Set(5*35, 10*35)
 			sfxPain.play()
 		}
 
@@ -461,7 +461,7 @@ for(var i=0; i<bullets.length; i++)
 				hit = true;
 				player.isDead == true;
 				lives -= 1;
-				player.position.Set(1*35, 10*35)
+				player.position.Set(5*35, 10*35)
 				score -= 5;
 				sfxPain.play()
 				break;

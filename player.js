@@ -55,7 +55,7 @@ var Player = function()
 		}
 
 		this.position = new Vector2 ();
-		this.position.Set(0.5*35, 10*35);
+		this.position.Set(5*35, 10*35);
 		this.width = 159;
 		this.height = 163;
 		this.velocity = new Vector2 ();
